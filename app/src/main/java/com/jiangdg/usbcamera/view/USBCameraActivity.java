@@ -1,5 +1,6 @@
 package com.jiangdg.usbcamera.view;
 
+import android.app.Activity;
 import android.hardware.usb.UsbDevice;
 import android.os.Bundle;
 import android.os.Handler;
@@ -10,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
 import android.widget.AdapterView;
@@ -27,6 +29,7 @@ import androidx.appcompat.widget.Toolbar;
 import com.jiangdg.usbcamera.UVCCameraHelper;
 import com.jiangdg.usbcamera.application.MyApplication;
 import com.jiangdg.usbcamera.utils.FileUtils;
+import com.jiangdg.usbcamera.utils.RotationGestureDetector;
 import com.serenegiant.usb.CameraDialog;
 import com.serenegiant.usb.Size;
 import com.serenegiant.usb.USBMonitor;
@@ -47,7 +50,7 @@ import butterknife.ButterKnife;
  * Created by jiangdongguo on 2017/9/30.
  */
 
-public class USBCameraActivity extends AppCompatActivity implements CameraDialog.CameraDialogParent, CameraViewInterface.Callback {
+public class USBCameraActivity extends AppCompatActivity implements CameraDialog.CameraDialogParent, CameraViewInterface.Callback, RotationGestureDetector.OnRotationGestureListener {
     private static final String TAG = "Debug";
     @BindView(R.id.camera_view)
     public View mTextureView;
@@ -56,12 +59,16 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
     @BindView(R.id.seekbar_contrast)
     public SeekBar mSeekContrast;
 
+    private float staticAngle = 0;
+    private float liveAngle = 0;
+
     private UVCCameraHelper mCameraHelper;
     private CameraViewInterface mUVCCameraView;
     private AlertDialog mDialog;
 
     private boolean isRequest;
     private boolean isPreview;
+    private RotationGestureDetector mRotationDetector;
 
     private UVCCameraHelper.OnMyDevConnectListener listener = new UVCCameraHelper.OnMyDevConnectListener() {
 
@@ -127,6 +134,7 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
         setContentView(R.layout.activity_usbcamera);
         ButterKnife.bind(this);
         initView();
+        mRotationDetector = new RotationGestureDetector(this);
 
         // step.1 initialize UVCCameraHelper
         mUVCCameraView = (CameraViewInterface) mTextureView;
@@ -203,12 +211,6 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_toobar, menu);
-        return true;
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
        return super.onOptionsItemSelected(item);
     }
@@ -229,9 +231,9 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
                 final String resolution = (String) adapterView.getItemAtPosition(position);
                 String[] tmp = resolution.split("x");
                 if (tmp != null && tmp.length >= 2) {
-                    int widht = Integer.valueOf(tmp[0]);
+                    int width = Integer.valueOf(tmp[0]);
                     int height = Integer.valueOf(tmp[1]);
-                    mCameraHelper.updateResolution(widht, height);
+                    mCameraHelper.updateResolution(width, height);
                 }
                 mDialog.dismiss();
             }
@@ -279,7 +281,7 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
     @Override
     public void onDialogResult(boolean canceled) {
         if (canceled) {
-            showShortMsg("取消操作");
+            showShortMsg("Error");
         }
     }
 
@@ -307,4 +309,36 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
             isPreview = false;
         }
     }
+
+    private float calcLiveAngle(float currentRotation) {
+        float angle = this.staticAngle - currentRotation;
+
+        angle = angle % 360;
+        if (angle < -180.f) angle += 360.0f;
+        if (angle > 180.f) angle -= 360.0f;
+        return angle;
+    }
+
+    private void setNewStaticAngle() {
+        this.staticAngle = calcLiveAngle(this.liveAngle);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event){
+        if (event.getAction() == MotionEvent.ACTION_UP) {
+            this.setNewStaticAngle();
+        }
+        mRotationDetector.onTouchEvent(event);
+        return super.onTouchEvent(event);
+    }
+
+    @Override
+    public void OnRotation(RotationGestureDetector rotationDetector) {
+        float angle = rotationDetector.getAngle();
+//        Log.d("RotationGestureDetector", "Rotation: " + Float.toString(angle));
+        liveAngle = angle;
+        Log.d("RotationGestureDetector", "Rotation: " + Float.toString(this.calcLiveAngle(angle)));
+        mTextureView.setRotation(this.calcLiveAngle(angle));
+    }
+
 }
