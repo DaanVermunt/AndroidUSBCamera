@@ -8,31 +8,34 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:gravity="center_horizontal|center_vertical"
-        android:text="Welcome to use!"
+        android:text="Video Laryngoscope"
         android:textSize="28sp"
         android:textStyle="bold" />
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal|center_vertical"
+        android:text="SmartMedics"
         android:textSize="14sp"
-        android:textStyle="italic"
-        android:text="Author: jiangdongguo"/>
+        android:textStyle="italic" />
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal|center_vertical"
         android:layout_marginTop="5dp"
-        android:textStyle="italic"
+        android:text="dieuwertje@drexhage.nl"
         android:textSize="14sp"
-        android:text="Email:765067602@qq.com"/>
+        android:textStyle="italic" />
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:text="last modify 2020.01"
-        android:textSize="16sp"
-        android:textStyle="bold"
+        android:layout_weight="1"
         android:gravity="bottom|center_horizontal"
         android:paddingBottom="20dp"
-        android:layout_weight="1"/>
+        android:text="Version: Clinical Trials 1.0"
+        android:textSize="16sp"
+        android:textStyle="bold" />
 </LinearLayout>
