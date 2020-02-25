@@ -27,7 +27,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.jiangdg.usbcamera.UVCCameraHelper;
 import com.jiangdg.usbcamera.utils.FileUtils;
-import com.jiangdg.usbcamera.utils.RotationGestureDetector;
+import com.smartmedics.usbcamera.utils.RotationGestureDetector;
 import com.serenegiant.usb.CameraDialog;
 import com.serenegiant.usb.Size;
 import com.serenegiant.usb.USBMonitor;
