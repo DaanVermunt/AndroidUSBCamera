@@ -1,4 +1,4 @@
-package com.jiangdg.usbcamera.utils;
+package com.smartmedics.usbcamera.utils;
 
 import android.view.MotionEvent;
 
